@@ -44,11 +44,65 @@ def index():
         return redirect(url_for("list_doctors"))
     return render_template("index.html")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        full_name = request.form["full_name"].strip()
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
 
+        if not full_name or not email or not password:
+            flash("Todos los campos son obligatorios.", "danger")
+            return render_template("register.html")
 
+        db = get_db()
+        try:
+            db.execute(
+                "INSERT INTO patients(full_name, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
+                (
+                    full_name,
+                    email,
+                    generate_password_hash(password),
+                    datetime.now().isoformat(),
+                ),
+            )
+            db.commit()
+            flash("Paciente registrado con éxito. Ya puedes iniciar sesión.", "success")
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            flash("Ese correo ya está registrado.", "danger")
 
+    return render_template("register.html")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        full_name = request.form["full_name"].strip()
+        email = request.form["email"].strip().lower()
+        password = request.form["password"]
 
+        if not full_name or not email or not password:
+            flash("Todos los campos son obligatorios.", "danger")
+            return render_template("register.html")
+
+        db = get_db()
+        try:
+            db.execute(
+                "INSERT INTO patients(full_name, email, password_hash, created_at) VALUES (?, ?, ?, ?)",
+                (
+                    full_name,
+                    email,
+                    generate_password_hash(password),
+                    datetime.now().isoformat(),
+                ),
+            )
+            db.commit()
+            flash("Paciente registrado con éxito. Ya puedes iniciar sesión.", "success")
+            return redirect(url_for("login"))
+        except sqlite3.IntegrityError:
+            flash("Ese correo ya está registrado.", "danger")
+
+    return render_template("register.html")
 
 
 @app.route("/logout")

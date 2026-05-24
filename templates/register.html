@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="h4 mb-4">Registro de Paciente</h2>
+        <form method="post">
+          <div class="mb-3">
+            <label class="form-label">Nombre completo</label>
+            <input name="full_name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+          <button class="btn btn-primary w-100">Registrar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

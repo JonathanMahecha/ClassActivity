@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Mis citas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4 mb-0">Mis Citas</h2>
+  <a href="{{ url_for('list_doctors') }}" class="btn btn-primary">Nueva cita</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+      <tr>
+        <th>Médico</th>
+        <th>Especialidad</th>
+        <th>Fecha y hora</th>
+        <th>Estado</th>
+        <th>Notas</th>
+        <th>Acción</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for appt in appointments %}
+        <tr>
+          <td>{{ appt.doctor_name }}</td>
+          <td>{{ appt.specialty }}</td>
+          <td>{{ appt.start_time[:16].replace('T', ' ') }}</td>
+          <td>
+            {% if appt.status == 'scheduled' %}
+              <span class="badge bg-success">Agendada</span>
+            {% else %}
+              <span class="badge bg-secondary">Cancelada</span>
+            {% endif %}
+          </td>
+          <td>{{ appt.notes or '-' }}</td>
+          <td>
+            {% if appt.status == 'scheduled' %}
+              <form method="post" action="{{ url_for('cancel_appointment', appointment_id=appt.id) }}">
+                <button class="btn btn-sm btn-outline-danger">Cancelar</button>
+              </form>
+            {% else %}
+              -
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">Todavía no tienes citas registradas.</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

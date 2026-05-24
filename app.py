@@ -145,6 +145,86 @@ def available_slots(doctor_id: int):
 
     return render_template("slots.html", doctor=doctor, slots=slots)
 
+@app.route("/appointments", methods=["GET", "POST"])
+@login_required
+def appointments():
+    db = get_db()
+    patient_id = session["patient_id"]
+
+    if request.method == "POST":
+        slot_id = request.form.get("slot_id", type=int)
+        notes = request.form.get("notes", "").strip()
+
+        slot = db.execute(
+            "SELECT id, doctor_id, start_time FROM slots WHERE id = ?", (slot_id,)
+        ).fetchone()
+
+        if slot is None:
+            flash("El horario seleccionado no existe.", "danger")
+            return redirect(url_for("list_doctors"))
+
+        duplicate = db.execute(
+            """
+            SELECT a.id
+            FROM appointments a
+            JOIN slots s ON s.id = a.slot_id
+            WHERE s.doctor_id = ?
+            AND datetime(s.start_time) = datetime(?)
+            AND a.status = 'scheduled'
+            """,
+            (slot["doctor_id"], slot["start_time"]),
+        ).fetchone()
+
+        if duplicate:
+            flash("Ese horario ya fue tomado, elige otro.", "warning")
+            return redirect(url_for("available_slots", doctor_id=slot["doctor_id"]))
+
+        patient_duplicate = db.execute(
+            """
+            SELECT a.id
+            FROM appointments a
+            JOIN slots s ON s.id = a.slot_id
+            WHERE a.patient_id = ?
+            AND datetime(s.start_time) = datetime(?)
+            AND a.status = 'scheduled'
+            """,
+            (patient_id, slot["start_time"]),
+        ).fetchone()
+
+        if patient_duplicate:
+            flash("Ya tienes una cita en ese mismo horario.", "warning")
+            return redirect(url_for("appointments"))
+
+        db.execute(
+            """
+            INSERT INTO appointments(patient_id, doctor_id, slot_id, notes, status, created_at)
+            VALUES (?, ?, ?, ?, 'scheduled', ?)
+            """,
+            (
+                patient_id,
+                slot["doctor_id"],
+                slot["id"],
+                notes,
+                datetime.now().isoformat(),
+            ),
+        )
+        db.commit()
+        flash("Cita agendada con éxito.", "success")
+        return redirect(url_for("appointments"))
+
+    rows = db.execute(
+        """
+        SELECT a.id, d.full_name AS doctor_name, d.specialty, s.start_time, a.notes, a.status
+        FROM appointments a
+        JOIN doctors d ON d.id = a.doctor_id
+        JOIN slots s ON s.id = a.slot_id
+        WHERE a.patient_id = ?
+        ORDER BY s.start_time DESC
+        """,
+        (patient_id,),
+    ).fetchall()
+
+    return render_template("appointments.html", appointments=rows)
 
 if __name__ == "__main__":
     init_db()

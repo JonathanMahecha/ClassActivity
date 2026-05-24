@@ -316,28 +316,6 @@ def appointments():
     return render_template("appointments.html", appointments=rows)
 
 
-@app.post("/appointments/<int:appointment_id>/cancel")
-@login_required
-def cancel_appointment(appointment_id: int):
-    db = get_db()
-    patient_id = session["patient_id"]
-
-    appointment = db.execute(
-        "SELECT id FROM appointments WHERE id = ? AND patient_id = ? AND status = 'scheduled'",
-        (appointment_id, patient_id),
-    ).fetchone()
-
-    if not appointment:
-        flash("No se encontró la cita o ya está cancelada.", "warning")
-        return redirect(url_for("appointments"))
-
-    db.execute(
-        "UPDATE appointments SET status = 'cancelled' WHERE id = ?", (appointment_id,)
-    )
-    db.commit()
-    flash("Cita cancelada correctamente.", "info")
-    return redirect(url_for("appointments"))
-
 
 if __name__ == "__main__":
     init_db()

@@ -111,7 +111,39 @@ def logout():
     flash("Sesión cerrada.", "info")
     return redirect(url_for("index"))
 
+@app.route("/doctors")
+@login_required
+def list_doctors():
+    db = get_db()
+    doctors = db.execute(
+        "SELECT id, full_name, specialty FROM doctors ORDER BY full_name"
+    ).fetchall()
+    return render_template("doctors.html", doctors=doctors)
 
+
+@app.route("/doctors/<int:doctor_id>/slots")
+@login_required
+def available_slots(doctor_id: int):
+    db = get_db()
+    doctor = db.execute(
+        "SELECT id, full_name, specialty FROM doctors WHERE id = ?", (doctor_id,)
+    ).fetchone()
+
+    slots = db.execute(
+        """
+        SELECT
+            s.id,
+            s.start_time,
+            CASE WHEN a.id IS NULL THEN 1 ELSE 0 END AS is_available
+        FROM slots s
+        LEFT JOIN appointments a ON a.slot_id = s.id AND a.status = 'scheduled'
+        WHERE s.doctor_id = ?
+        ORDER BY s.start_time
+        """,
+        (doctor_id,),
+    ).fetchall()
+
+    return render_template("slots.html", doctor=doctor, slots=slots)
 
 
 if __name__ == "__main__":

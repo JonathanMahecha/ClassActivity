@@ -1,0 +1,58 @@
+Historias de Usuario
+
+Historia de Usuario 1 — Registro de pacientes
+Como paciente
+Quiero registrarme en la plataforma
+Para poder acceder al sistema y gestionar mis citas médicas.
+
+Criterios de aceptación:
+El sistema debe solicitar:
+nombre
+correo
+contraseña
+El correo no puede repetirse.
+La contraseña debe almacenarse cifrada.
+
+
+Historia de Usuario 2 — Inicio de sesión
+Como paciente registrado
+Quiero iniciar sesión
+Para acceder a las funcionalidades del sistema.
+
+Criterios de aceptación:
+Validar correo y contraseña.
+Crear sesión del usuario autenticado.
+Mostrar mensaje si las credenciales son inválidas.
+
+Historia de Usuario 3 — Consulta de doctores y horarios
+Como paciente
+Quiero visualizar doctores y horarios disponibles
+Para seleccionar una cita médica.
+
+Criterios de aceptación:
+Mostrar lista de doctores.
+Mostrar especialidad médica.
+Mostrar horarios disponibles.
+No mostrar horarios ocupados.
+
+Historia de Usuario 4 — Agendamiento de citas
+Como paciente
+Quiero agendar una cita médica
+Para reservar atención con un especialista.
+
+Criterios de aceptación:
+Validar disponibilidad del horario.
+Evitar duplicidad de citas.
+Guardar la información en la base de datos.
+Mostrar mensaje de confirmación.
+
+Historia de Usuario 5 — Cancelación de citas
+Como paciente
+Quiero cancelar una cita médica
+Para liberar el horario reservado.
+
+Criterios de aceptación:
+Mostrar citas activas.
+Permitir cancelar la cita.
+Cambiar estado de la cita a “cancelled”.
+Actualizar disponibilidad del horario.

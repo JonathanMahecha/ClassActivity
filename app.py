@@ -31,13 +31,6 @@ def get_db() -> sqlite3.Connection:
     return g.db
 
 
-@app.teardown_appcontext
-def close_db(_: object) -> None:
-    db = g.pop("db", None)
-    if db is not None:
-        db.close()
-
-
 def init_db() -> None:
     db = sqlite3.connect(DATABASE)
     db.row_factory = sqlite3.Row  # <-- ESTA LÍNEA ARREGLA EL ERROR
